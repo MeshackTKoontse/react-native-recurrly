@@ -28,7 +28,7 @@ export default function App() {
       </Link>
       <Link
         className="p-4 mt-4 font-sans-semibold bg-primary rounded  text-white"
-        href="/subscription/spotify"
+        href="/subscriptions/spotify"
       >
         <Text className="">Go to Sign up</Text>
       </Link>
@@ -41,6 +41,6 @@ export default function App() {
       >
         <Text className="">Claude Max Subscrioption</Text>
       </Link>
-    </View>
+    </View> 
   );
 }
