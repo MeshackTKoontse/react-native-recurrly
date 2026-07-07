@@ -1,5 +1,30 @@
 import "@/global.css";
-import { Stack } from "expo-router";
+
+import { useFonts } from "expo-font";
+import { SplashScreen, Stack } from "expo-router";
+import { useEffect } from "react";
+import { AuthProvider } from "./contexts/AuthContext";
+
+SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  const [fontsLoaded] = useFonts({
+    "sans-regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
+    "sans-semibold": require("../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
+    "sans-bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
+    "sans-extrabold": require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
+    "sans-light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+  return (
+    <AuthProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AuthProvider>
+  );
 }
