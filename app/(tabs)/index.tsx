@@ -1,3 +1,4 @@
+import AddSubscription from "@/components/AddSubscription";
 import ListHeading from "@/components/ListHeading";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
@@ -7,7 +8,6 @@ import {
   HOME_USER,
   UPCOMING_SUBSCRIPTIONS,
 } from "@/constants/data";
-import { icons } from "@/constants/icons";
 import images from "@/constants/images";
 import "@/global.css";
 import { formatCurrency } from "@/lib/utils";
@@ -22,6 +22,15 @@ export default function App() {
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
     string | null
   >(null);
+  const [subscriptions, setSubscriptions] = useState(HOME_SUBSCRIPTIONS);
+
+  const handleAddSubscription = (newSubscription: Subscription) => {
+    setSubscriptions((currentSubscriptions) => [
+      newSubscription,
+      ...currentSubscriptions,
+    ]);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
       <FlatList
@@ -34,7 +43,7 @@ export default function App() {
                 <Text className="home-user-name">{HOME_USER.name}</Text>
               </View>
 
-              <Image source={icons.add} className="home-add-icon" />
+              <AddSubscription onAdd={handleAddSubscription} />
             </View>
             <View className="home-balance-card">
               <Text className="home-balance-label"> Balance</Text>
@@ -67,7 +76,7 @@ export default function App() {
             <ListHeading title="All Subscriptions" />
           </>
         }
-        data={HOME_SUBSCRIPTIONS}
+        data={subscriptions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <SubscriptionCard

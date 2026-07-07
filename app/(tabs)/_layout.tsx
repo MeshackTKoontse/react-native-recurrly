@@ -1,10 +1,11 @@
 import { tabs } from "@/constants/data";
 import { colors, components } from "@/constants/theme";
 import clsx from "clsx";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Image, View } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext";
 
 const tabBar = components.tabBar;
 const TabLayout = () => {
@@ -18,6 +19,11 @@ const TabLayout = () => {
       </View>
     );
   };
+  const { session, isLoading } = useAuth();
+
+  if (isLoading) return null;
+  if (!session) return <Redirect href="/(auth)/sign-in" />;
+
   return (
     <Tabs
       screenOptions={{

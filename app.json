@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.recurrly"
     },
     "web": {
       "output": "static",
@@ -51,7 +52,9 @@
             "./assets/fonts/PlusJakartaSans-Light.ttf"
           ]
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,
