@@ -1,8 +1,10 @@
+import { useAuth } from "@/app/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { styled } from "nativewind";
 import React, { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { usePostHog } from "posthog-react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView);
@@ -23,13 +25,25 @@ const SettingRow = ({
 );
 
 const Settings = () => {
+  const posthog = usePostHog();
+  const { session } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSignOut = async () => {
     setLoading(true);
-    await supabase.auth.signOut();
-    setLoading(false);
-    router.replace("/sign-in");
+
+    try {
+      posthog.capture("user_signed_out", {
+        had_active_session: Boolean(session),
+      });
+      await supabase.auth.signOut();
+      posthog.reset();
+      router.replace("/(auth)/sign-in");
+    } catch (err) {
+      posthog.captureException(err as Error);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -48,7 +62,7 @@ const Settings = () => {
         <View className="rounded-3xl bg-card p-4">
           <Text className="text-lg font-sans-bold text-primary">Account</Text>
           <Text className="mt-2 text-sm font-sans-medium text-muted-foreground">
-            meshack@example.com
+            {session?.user?.email || "Signed in account"}
           </Text>
           <Text className="mt-4 text-sm font-sans-medium text-muted-foreground">
             Connected member since 2024 with a secure, fast subscription

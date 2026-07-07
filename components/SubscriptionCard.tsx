@@ -5,6 +5,7 @@ import {
 } from "@/lib/utils";
 import clsx from "clsx";
 import React from "react";
+import { usePostHog } from "posthog-react-native";
 import { Image, Pressable, Text, View } from "react-native";
 
 const SubscriptionCard = ({
@@ -23,9 +24,24 @@ const SubscriptionCard = ({
   paymentMethod,
   status,
 }: SubscriptionCardProps) => {
+  const posthog = usePostHog();
+
+  const handlePress = () => {
+    if (!expanded) {
+      posthog.capture("subscription_viewed", {
+        category: category?.trim() || plan?.trim() || "uncategorized",
+        billing_period: billing?.toLowerCase() || "unknown",
+        status: status || "unknown",
+        has_renewal_date: Boolean(renewalDate),
+      });
+    }
+
+    onPress?.();
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       className={clsx("sub-card", expanded ? "sub-card-expanded" : "bg-card")}
       style={!expanded && color ? { backgroundColor: color } : undefined}
     >

@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { usePostHog } from "posthog-react-native";
 
 import "@/global.css";
 
@@ -26,6 +27,7 @@ const initialForm = {
 };
 
 export default function AddSubscription({ onAdd }: AddSubscriptionProps) {
+  const posthog = usePostHog();
   const [visible, setVisible] = useState(false);
   const [form, setForm] = useState(initialForm);
 
@@ -43,22 +45,34 @@ export default function AddSubscription({ onAdd }: AddSubscriptionProps) {
       return;
     }
 
+    const trimmedName = form.name.trim();
+    const trimmedCategory = form.category.trim();
+    const trimmedBilling = form.billing.trim() || "Monthly";
+    const hasRenewalDate = Boolean(form.renewalDate.trim());
+
     const newSubscription: Subscription = {
       id: `custom-${Date.now()}`,
       icon: icons.wallet,
-      name: form.name.trim(),
-      category: form.category.trim() || undefined,
+      name: trimmedName,
+      category: trimmedCategory || undefined,
       paymentMethod: form.paymentMethod.trim() || undefined,
       status: "active",
       price,
       currency: "USD",
-      billing: form.billing.trim() || "Monthly",
+      billing: trimmedBilling,
       renewalDate: form.renewalDate.trim() || undefined,
       color: "#fbe9d2",
       startDate: new Date().toISOString(),
     };
 
     onAdd(newSubscription);
+    posthog.capture("subscription_added", {
+      category: trimmedCategory || "uncategorized",
+      billing_period: trimmedBilling.toLowerCase(),
+      has_renewal_date: hasRenewalDate,
+      price,
+      currency: newSubscription.currency,
+    });
     resetForm();
     setVisible(false);
   };

@@ -2,6 +2,7 @@ import { Link, router } from "expo-router";
 import { styled } from "nativewind";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { usePostHog } from "posthog-react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 import "@/global.css";
@@ -18,6 +20,7 @@ import { supabase } from "@/lib/supabase";
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function SignUpScreen() {
+  const posthog = usePostHog();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,14 +28,19 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    // Basic validation
     if (!email || !password || !fullName) {
       setError("Please fill in all fields");
+      posthog.capture("auth_sign_up_failed", {
+        failure_reason: "missing_required_fields",
+      });
       return;
     }
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
+      posthog.capture("auth_sign_up_failed", {
+        failure_reason: "password_too_short",
+      });
       return;
     }
 
@@ -40,34 +48,36 @@ export default function SignUpScreen() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
         options: {
           data: {
-            full_name: fullName.trim(), // This gets stored in user metadata
+            full_name: fullName.trim(),
           },
         },
       });
 
       if (error) {
         setError(error.message);
+        posthog.capture("auth_sign_up_failed", {
+          failure_reason: error.message,
+        });
         return;
       }
 
-      // Success!
-      console.log("User signed up successfully:", data.user?.id);
-
-      // Option 1: Show success message and ask user to check email
-      alert(
-        "Account created! Please check your email to confirm your account.",
+      posthog.capture("auth_sign_up_succeeded");
+      Alert.alert(
+        "Account created!",
+        "Please check your email to confirm your account.",
       );
-
-      // Option 2: Automatically sign in after signup (if email confirmation is disabled)
       router.replace("/(tabs)");
-    } catch (err: any) {
+    } catch (err) {
       setError("Something went wrong. Please try again.");
-      console.error(err);
+      posthog.captureException(err as Error);
+      posthog.capture("auth_sign_up_failed", {
+        failure_reason: "unexpected_error",
+      });
     } finally {
       setLoading(false);
     }

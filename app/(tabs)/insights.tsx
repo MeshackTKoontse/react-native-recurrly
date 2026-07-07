@@ -3,7 +3,9 @@ import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
 import { HOME_SUBSCRIPTIONS, UPCOMING_SUBSCRIPTIONS } from "@/constants/data";
 import { formatCurrency } from "@/lib/utils";
 import { styled } from "nativewind";
+import { useEffect } from "react";
 import { FlatList, Text, View } from "react-native";
+import { usePostHog } from "posthog-react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView);
@@ -29,6 +31,7 @@ const InsightCard = ({
 );
 
 const Insights = () => {
+  const posthog = usePostHog();
   const totalSpend = HOME_SUBSCRIPTIONS.reduce(
     (total, item) => total + item.price,
     0,
@@ -37,6 +40,14 @@ const Insights = () => {
     (item) => item.status === "active",
   ).length;
   const upcomingCount = UPCOMING_SUBSCRIPTIONS.length;
+
+  useEffect(() => {
+    posthog.capture("insights_summary_viewed", {
+      total_monthly_spend: totalSpend,
+      active_subscription_count: activeCount,
+      upcoming_renewal_count: upcomingCount,
+    });
+  }, [activeCount, posthog, totalSpend, upcomingCount]);
 
   return (
     <SafeAreaView className="flex-1 bg-background p-5">

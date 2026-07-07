@@ -3,16 +3,25 @@ import SubscriptionCard from "@/components/SubscriptionCard";
 import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
 import { HOME_SUBSCRIPTIONS, UPCOMING_SUBSCRIPTIONS } from "@/constants/data";
 import { styled } from "nativewind";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
+import { usePostHog } from "posthog-react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
 const Subscriptions = () => {
+  const posthog = usePostHog();
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
     string | null
   >(null);
+
+  useEffect(() => {
+    posthog.capture("subscriptions_overview_viewed", {
+      subscription_count: HOME_SUBSCRIPTIONS.length,
+      upcoming_renewal_count: UPCOMING_SUBSCRIPTIONS.length,
+    });
+  }, [posthog]);
 
   return (
     <SafeAreaView className="flex-1 bg-background p-5">

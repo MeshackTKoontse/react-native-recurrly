@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { usePostHog } from "posthog-react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 import "@/global.css";
@@ -18,6 +19,7 @@ import { supabase } from "@/lib/supabase";
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function SignInScreen() {
+  const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,19 +31,26 @@ export default function SignInScreen() {
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) {
         setError(error.message);
+        posthog.capture("auth_sign_in_failed", {
+          failure_reason: error.message,
+        });
         return;
       }
 
-      // Success - navigate to main app
+      posthog.capture("auth_sign_in_succeeded");
       router.replace("/(tabs)");
     } catch (err) {
       setError("Something went wrong. Please try again.");
+      posthog.captureException(err as Error);
+      posthog.capture("auth_sign_in_failed", {
+        failure_reason: "unexpected_error",
+      });
     } finally {
       setLoading(false);
     }
