@@ -3,10 +3,11 @@ import {
   formatStatusLabel,
   formatSubscriptionDateTime,
 } from "@/lib/utils";
-import clsx from "clsx";
-import React from "react";
+import { Feather } from "@expo/vector-icons";
+import { clsx } from "clsx";
 import { usePostHog } from "posthog-react-native";
-import { Image, Pressable, Text, View } from "react-native";
+import React from "react";
+import { Alert, Image, Pressable, Text, View } from "react-native";
 
 const SubscriptionCard = ({
   name,
@@ -23,8 +24,25 @@ const SubscriptionCard = ({
   startDate,
   paymentMethod,
   status,
+  onEdit,
+  onDelete,
 }: SubscriptionCardProps) => {
   const posthog = usePostHog();
+
+  const handleDeletePress = () => {
+    Alert.alert(
+      "Delete subscription",
+      `Are you sure you want to delete ${name}? This action cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete?.(),
+        },
+      ],
+    );
+  };
 
   const handlePress = () => {
     if (!expanded) {
@@ -55,7 +73,9 @@ const SubscriptionCard = ({
             <Text numberOfLines={1} ellipsizeMode="tail" className="sub-meta">
               {category?.trim() ||
                 plan?.trim() ||
-                (renewalDate ? formatSubscriptionDateTime(renewalDate) : "Not provided")}
+                (renewalDate
+                  ? formatSubscriptionDateTime(renewalDate)
+                  : "Not provided")}
             </Text>
           </View>
         </View>
@@ -99,7 +119,9 @@ const SubscriptionCard = ({
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {startDate ? formatSubscriptionDateTime(startDate) : "Not provided"}
+                  {startDate
+                    ? formatSubscriptionDateTime(startDate)
+                    : "Not provided"}
                 </Text>
               </View>
             </View>
@@ -111,7 +133,9 @@ const SubscriptionCard = ({
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {renewalDate ? formatSubscriptionDateTime(renewalDate) : "Not provided"}
+                  {renewalDate
+                    ? formatSubscriptionDateTime(renewalDate)
+                    : "Not provided"}
                 </Text>
               </View>
             </View>
@@ -125,6 +149,28 @@ const SubscriptionCard = ({
                 >
                   {status ? formatStatusLabel(status) : "Not provided"}
                 </Text>
+              </View>
+              <View className="sub-row justify-end">
+                <View className="flex-row items-center gap-2">
+                  <Pressable
+                    onPress={(event) => {
+                      event.stopPropagation();
+                      onEdit?.();
+                    }}
+                    className="rounded-xl border border-accent/20 bg-accent/10 p-2"
+                  >
+                    <Feather name="edit-3" size={16} color="#081126" />
+                  </Pressable>
+                  <Pressable
+                    onPress={(event) => {
+                      event.stopPropagation();
+                      handleDeletePress();
+                    }}
+                    className="rounded-xl border border-red-300  p-2"
+                  >
+                    <Feather name="trash-2" size={16} color="#dc2626" />
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>
