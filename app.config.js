@@ -67,5 +67,11 @@ export default {
       posthogProjectToken: process.env.EXPO_PUBLIC_POSTHOG_PROJECT_TOKEN,
       posthogHost: process.env.EXPO_PUBLIC_POSTHOG_HOST,
     },
+    updates: {
+      url: "https://u.expo.dev/ec6e06a1-c50b-4fa6-a8e1-c3a95739ad1f",
+    },
+    runtimeVersion: {
+      policy: "appVersion",
+    },
   },
 };
