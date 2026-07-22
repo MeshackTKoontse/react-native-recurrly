@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 
 let subscriptionsCache: Subscription[] = [];
 
-export const subscriptionService = {
+const subscriptionService = {
   // Fetch all
   async getAll() {
     const { data, error } = await supabase
@@ -128,3 +128,5 @@ export const subscriptionService = {
     return subscriptionsCache;
   },
 };
+
+export default subscriptionService;

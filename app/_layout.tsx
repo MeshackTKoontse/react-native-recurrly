@@ -1,5 +1,6 @@
 import "@/global.css";
 
+import { posthog } from "@/lib/posthog";
 import { useFonts } from "expo-font";
 import {
   SplashScreen,
@@ -7,10 +8,9 @@ import {
   useGlobalSearchParams,
   usePathname,
 } from "expo-router";
-import { useEffect, useRef } from "react";
 import { PostHogProvider } from "posthog-react-native";
-import { posthog } from "@/lib/posthog";
-import { AuthProvider } from "./contexts/AuthContext";
+import { useEffect, useRef } from "react";
+import AuthProvider from "./contexts/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
