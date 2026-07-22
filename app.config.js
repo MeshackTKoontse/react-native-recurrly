@@ -4,7 +4,7 @@ export default {
     slug: "recurrly",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/logo.png",
+    icon: "./assets/icons/logo.png",
     scheme: "recurrly",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -12,12 +12,6 @@ export default {
       supportsTablet: true,
     },
     android: {
-      adaptiveIcon: {
-        backgroundColor: "#E6F4FE",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
-        monochromeImage: "./assets/images/android-icon-monochrome.png",
-      },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: "com.anonymous.recurrly",

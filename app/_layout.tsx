@@ -12,7 +12,7 @@ import { PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef } from "react";
 import AuthProvider from "./contexts/AuthContext";
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function RootLayout() {
   const pathname = usePathname();
   const params = useGlobalSearchParams();
@@ -25,6 +25,8 @@ export default function RootLayout() {
     "sans-light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
   });
 
+  console.log("URL:", process.env.EXPO_PUBLIC_SUPABASE_URL);
+  console.log("KEY:", process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
