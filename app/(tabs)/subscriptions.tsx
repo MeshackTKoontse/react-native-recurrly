@@ -5,7 +5,7 @@ import { usePostHog } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-import { subscriptionService } from "../services/subscriptionService";
+import subscriptionService from "../services/subscriptionService";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
